@@ -6,13 +6,15 @@ import Sobre from "../screens/Sobre/Sobre";
 import Login from "../screens/Login/Login";
 import { AuthContext } from '../context/AuthContext';
 import Teste from '../screens/Teste/Teste';
-import Carrinho from '../screens/Carrinho/Carrinho';
+import Cadastro from '../screens/Cadastro/Cadastro';
 
 export type RootTabParamList = {
     Home:undefined;
     Sobre:undefined;
     Login:undefined;
     Teste:undefined;
+    Cadastro:undefined;
+
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>(); //cria navegação bottom tabs
@@ -27,10 +29,11 @@ const {token} = useContext(AuthContext);
         <>
       <Tab.Screen name="Home" component={Home}/>
       <Tab.Screen name="Teste" component={Teste}/>
-      <Tab.Screen name="Carrinho" component={Carrinho}/>
       <Tab.Screen name="Sobre" component={Sobre}/>
     </>
     )}
+    <Tab.Screen name="Cadastro" component={Cadastro}/>
     </Tab.Navigator>
+    
   )
 }
