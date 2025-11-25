@@ -5,35 +5,39 @@ import api from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { useNavigation } from "@react-navigation/native";
-import Cadastro from '../../screens/Cadastro/Cadastro';
 
 export default function Login() {
   const navigation = useNavigation();
-  const { setToken } = useContext(AuthContext);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
 
+  // ✔️ useContext deve estar AQUI, NÃO dentro da função handleLogin
+  const { setLoginData } = useContext(AuthContext);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const resp = await api.post("/login", {email: email,senha: password});
-      const { token } = resp.data;
+      const resp = await api.post("/login", {
+        email: email,
+        senha: password
+      });
+
+      console.log("RESP LOGIN >>>", resp.data);
+
+      const { token, nome, idTime } = resp.data;
 
       if (!token) {
-        Alert.alert("Credenciais do token inválidas!");
+        Alert.alert("Erro", "Token inválido!");
         return;
       }
 
-    await AsyncStorage.setItem("token", token);
-    setToken(token);         
+      // ✔️ Agora isso vai funcionar
+      setLoginData(token, nome, idTime);
 
     } catch (error) {
-      Alert.alert("Usuário ou senha inválidos!");
+      console.log(error);
+      Alert.alert("Erro", "Usuário ou senha inválidos!");
     }
-  };
-
-  const navigateCadastro = () => {
-    navigation.navigate("Cadastro");
   };
 
   return (
@@ -52,7 +56,7 @@ export default function Login() {
         <Text style={styles.submitText}>Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.submitButton} onPress={navigateCadastro}>
+      <TouchableOpacity style={styles.submitButton} onPress={() => navigation.navigate("Cadastro")}>
         <Text style={styles.submitText}>Criar Conta</Text>
       </TouchableOpacity>
     </View>
