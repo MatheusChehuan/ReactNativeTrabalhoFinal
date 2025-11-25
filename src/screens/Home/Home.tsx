@@ -9,7 +9,7 @@ export default function Home() {
   const [time, setTime] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  
+
   async function carregarTime() {
     try {
       const resp = await axios.get(
