@@ -1,7 +1,9 @@
-import {View, Text, TextInput, TouchableOpacity, Alert} from "react-native";
-import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import api from "../../services/api";
+import axios from "axios";
+import { Picker } from "@react-native-picker/picker";
 import { styles } from "./styles";
 
 export default function Cadastro() {
@@ -11,49 +13,80 @@ export default function Cadastro() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  const [times, setTimes] = useState([]);
+  const [timeEscolhido, setTimeEscolhido] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function carregarTimes() {
+      try {
+        const resposta = await axios.get(
+          "https://api.football-data.org/v4/competitions/BSA/teams",
+          {
+            headers: {"X-Auth-Token": "ff34e45f2b0b46e98add24ebc0aa1c89",},
+          }
+        );
+
+        setTimes(resposta.data.teams);
+
+      } catch (error: any) {
+        console.log(
+          "Erro ao buscar times:",
+          error.response?.status,
+          error.response?.data
+        );
+        Alert.alert("Erro", "Não foi possível carregar os times.");
+      }
+    }
+
+    carregarTimes();
+  }, []);
+
   async function handleCadastro() {
-    if (!nome || !email || !senha) {
-      Alert.alert("Preencha todos os campos!");
+    if (!nome || !email || !senha || !timeEscolhido) {
+      Alert.alert("Preencha todos os campos e selecione um time!");
       return;
     }
 
     try {
-    const resposta = await api.post("/cadastro", {nome,email,senha,
-      usuarioPerfis: [
-        {
-          perfil: { id: 6 }
-        }
-      ]
-    });
+      await api.post("/cadastro", {nome, email, senha, idTime: Number(timeEscolhido),});
 
-Alert.alert("Conta criada com sucesso!");
-
+      Alert.alert("Conta criada com sucesso!");
       navigation.navigate("Login");
 
     } catch (erro) {
-      alert("Erro ao cadastrar! Tente novamente.");
+      console.log("ERRO NO CADASTRO:", erro);
+      Alert.alert("Erro ao cadastrar! Tente novamente.");
     }
   }
 
   return (
     <View style={styles.container}>
-
+      
       <View style={styles.areaInput}>
-        <TextInput placeholder="Seu nome" style={styles.input}value={nome}onChangeText={setNome}/>
+        <TextInput placeholder="Seu nome" style={styles.input} value={nome} onChangeText={setNome}/>
       </View>
 
       <View style={styles.areaInput}>
-        <TextInput placeholder="Seu email" style={styles.input}value={email}onChangeText={setEmail}/>
+        <TextInput placeholder="Seu email" style={styles.input} value={email} onChangeText={setEmail}/>
       </View>
 
       <View style={styles.areaInput}>
-        <TextInput placeholder="Sua senha" style={styles.input} value={senha}onChangeText={setSenha} secureTextEntry/>
+        <TextInput placeholder="Sua senha" style={styles.input} value={senha} onChangeText={setSenha} secureTextEntry/>
       </View>
+
+      <Text style={{ color: "black", marginTop: 10 }}>Que time é teu?</Text>
+
+      <Picker selectedValue={timeEscolhido} onValueChange={(v) => setTimeEscolhido(Number(v))}
+        style={{width: "90%",backgroundColor: "#222",color: "#fff",marginTop: 10,borderRadius: 8,}}>
+        <Picker.Item label="Selecione um time..." value={null} />
+
+        {times.map((t) => (<Picker.Item key={t.id} label={t.name} value={t.id} />))}
+
+      </Picker>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleCadastro}>
         <Text style={styles.submitText}>Cadastrar</Text>
       </TouchableOpacity>
-
     </View>
   );
 }

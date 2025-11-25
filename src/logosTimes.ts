@@ -1,0 +1,25 @@
+export const logosTimes: Record<string, any> = {
+  1783: require("../assets/Flamengo.png"),
+  1769: require("../assets/Palmeiras.png"),
+  1779: require("../assets/Corinthians.png"),
+  1780: require("../assets/Vasco da Gama.png"),
+  1770: require("../assets/Botafogo.png"),
+  6685: require("../assets/Santos.png"),
+  1767: require("../assets/Grêmio.png"),
+  6684: require("../assets/Internacional.png"),
+  1777: require("../assets/Bahia.png"),
+  3984: require("../assets/Fortaleza.png"),
+  1837: require("../assets/Ceará.png"),
+  1766: require("../assets/Atlético Mineiro.png"),
+  1771: require("../assets/Cruzeiro.png"),
+  1765: require("../assets/Fluminense.png"),
+  1776: require("../assets/São Paulo.png"),
+  1778: require("../assets/Sport Recife.png"),
+  4286: require("../assets/Red Bull Bragantino.png"),
+  1782: require("../assets/Vitória.png"),
+  4245: require("../assets/Juventude.png"),
+  4364: require("../assets/Mirassol-SP.png"),
+  
+
+  default: require("../assets/icon.png"),
+};
