@@ -17,5 +17,4 @@ export default function Home() {
       <Text>Home</Text>
       <Button title="Logout" color="red" onPress={handleLogout} />
     </View>
-  )
-}
+)};
