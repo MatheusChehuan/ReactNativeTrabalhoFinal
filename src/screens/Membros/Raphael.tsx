@@ -10,7 +10,7 @@ export default function Raphael() {
 
       <View style={styles.card}>
         <View style={styles.topo}>
-          <Image source={require("../../../assets/perfil.png")} style={styles.foto} />
+          <Image source={require("../../../assets/Raphael.png")} style={styles.foto} />
           <Text style={styles.nome}>Raphael</Text>
         </View>
 

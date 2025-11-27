@@ -1,128 +1,126 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  TouchableOpacity, 
-  FlatList, 
+import {
+  View,
+  Text,
+  FlatList,
   StatusBar,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Image,
+  Pressable,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { AxiosError } from 'axios'; 
 import { styles } from './styles';
 import footballApi from '../../services/footballApi';
+import { logosTimes } from '../../logosTimes';
 
 type Match = {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  homeID: number;
+  awayID: number;
   homeScore: number | null;
   awayScore: number | null;
   status: string;
-  time: string;
+  date: Date;
   league: string;
+  odds: { botao: string; odd: string }[];
 };
 
 export function AoVivo() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); 
   const [search, setSearch] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const generateOdd = () =>
+    (Math.random() * (5 - 1.4) + 1.4).toFixed(2);
 
   useEffect(() => {
-    fetchMatches();
+    fetchAllMatches();
   }, []);
 
-  async function fetchMatches() {
+  async function fetchAllMatches() {
     setLoading(true);
-    setError(null); 
+    setError(null);
 
     try {
-      const response = await footballApi.get('matches');
-      
-      const formattedMatches = response.data.matches
-        .filter((item: any) => item.status !== 'POSTPONED') 
+      const scheduled = await footballApi.get('matches?status=SCHEDULED');
+      const live = await footballApi.get('matches?status=LIVE');
+
+      const formatted = [...scheduled.data.matches, ...live.data.matches]
+        .filter((item: any) => item.status !== 'POSTPONED')
         .map((item: any) => ({
           id: item.id.toString(),
           homeTeam: item.homeTeam.shortName || item.homeTeam.name,
           awayTeam: item.awayTeam.shortName || item.awayTeam.name,
-          homeScore: item.score.fullTime.home, 
-          awayScore: item.score.fullTime.away, 
+          homeID: item.homeTeam.id,
+          awayID: item.awayTeam.id,
+          homeScore: item.score.fullTime.home,
+          awayScore: item.score.fullTime.away,
           status: item.status,
-          time: new Date(item.utcDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          league: item.competition.name
+          date: new Date(item.utcDate),
+          league: item.competition.name,
+          odds: [
+            { botao: '1', odd: generateOdd() },
+            { botao: 'X', odd: generateOdd() },
+            { botao: '2', odd: generateOdd() }
+          ]
         }));
 
-      const sortedMatches = formattedMatches.sort((a, b) => {
-        const isLiveA = a.status === 'IN_PLAY' || a.status === 'PAUSED';
-        const isLiveB = b.status === 'IN_PLAY' || b.status === 'PAUSED';
+      const sorted = formatted.sort((a, b) => a.date.getTime() - b.date.getTime());
+      setMatches(sorted);
 
-        if (isLiveA && !isLiveB) return -1;
-        if (!isLiveA && isLiveB) return 1;
-
-        return a.time.localeCompare(b.time);
-      });
-
-      setMatches(sortedMatches);
-
-    } catch (err) {
-      const error = err as AxiosError; 
-      console.error("Erro ao buscar partidas:", error);
-
-      if (error.message === 'Network Error') {
-        setError('Erro de Rede: Verifique sua conexão. Se este erro persistir, aguarde 60s (limite de API).');
-      } else if (error.response) {
-        const status = error.response.status;
-        if (status === 429) {
-          setError('Limite Excedido (429): Você fez muitas requisições. Aguarde 60 segundos e tente novamente.');
-        } else if (status === 404) {
-          setError('Erro 404: Endpoint da API não encontrado.');
-        } else if (status === 403) {
-          setError('Acesso Negado (403): Chave inválida ou acesso não autorizado.');
-        } else {
-          setError(`Erro HTTP ${status}: Falha ao carregar os dados.`);
-        }
-      } else {
-        setError('Ocorreu um erro desconhecido.');
-      }
-      
-    } finally {
-      setLoading(false);
+    } catch (e) {
+      setError('Não foi possível carregar os jogos.');
     }
+
+    setLoading(false);
   }
 
-  const filteredMatches = matches.filter((m) =>
-    m.homeTeam.toLowerCase().includes(search.toLowerCase()) ||
-    m.awayTeam.toLowerCase().includes(search.toLowerCase())
+  const filtered = matches.filter(
+    (m) =>
+      m.homeTeam.toLowerCase().includes(search.toLowerCase()) ||
+      m.awayTeam.toLowerCase().includes(search.toLowerCase())
   );
 
   const renderMatchCard = ({ item }: { item: Match }) => {
-    const isLive = item.status === 'IN_PLAY' || item.status === 'PAUSED';
+    const dia = item.date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+
+    const hora = item.date.toLocaleString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
     return (
       <View style={styles.matchCard}>
-        <View style={{flexDirection: 'row', marginBottom: 15, alignItems: 'center'}}>
-          <View style={{width: 4, height: 16, backgroundColor: isLive ? '#2ecc71' : '#AAA', marginRight: 8, borderRadius: 2}} />
-          <View>
-            <Text style={styles.competitionTitle}>{item.league}</Text>
-          </View>
+        <View style={styles.matchHeader}>
+          <Text style={styles.competitionTitle}>{item.league}</Text>
         </View>
 
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flex: 1}}>
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 1 }}>
+
             <View style={styles.matchRow}>
               <View style={styles.teamInfo}>
-                <View style={styles.teamLogoPlaceholder}><Text>🏠</Text></View>
+                <Image
+                  source={logosTimes[item.homeID] ?? logosTimes.default}
+                  style={styles.teamLogo}
+                />
                 <Text style={styles.teamName}>{item.homeTeam}</Text>
               </View>
               <Text style={styles.score}>{item.homeScore ?? '-'}</Text>
             </View>
 
-            <View style={[styles.matchRow, { marginBottom: 0 }]}>
+            <View style={styles.matchRow}>
               <View style={styles.teamInfo}>
-                <View style={styles.teamLogoPlaceholder}><Text>✈️</Text></View>
+                <Image
+                  source={logosTimes[item.awayID] ?? logosTimes.default}
+                  style={styles.teamLogo}
+                />
                 <Text style={styles.teamName}>{item.awayTeam}</Text>
               </View>
               <Text style={styles.score}>{item.awayScore ?? '-'}</Text>
@@ -130,17 +128,24 @@ export function AoVivo() {
           </View>
 
           <View style={styles.matchStatus}>
-            {isLive ? (
-              <View style={styles.liveBadge}>
-                <Text style={styles.liveText}>AO VIVO</Text>
-              </View>
-            ) : (
-              <Text style={styles.statusText}>{item.status === 'FINISHED' ? 'FIM' : ''}</Text>
-            )}
-            <Text style={[styles.statusText, isLive && {color: '#2ecc71', fontWeight: 'bold'}]}>
-              {item.time}
-            </Text>
+            <Text style={styles.dateText}>{dia}</Text>
+            <Text style={styles.timeText}>{hora}</Text>
           </View>
+        </View>
+
+        <View style={styles.oddsContainer}>
+          {item.odds.map((o, i) => (
+            <Pressable
+              key={i}
+              style={({ pressed }) => [
+                styles.oddButton,
+                pressed && styles.oddPressed
+              ]}
+            >
+              <Text style={styles.oddLabel}>{o.botao}</Text>
+              <Text style={styles.oddValue}>{o.odd}</Text>
+            </Pressable>
+          ))}
         </View>
       </View>
     );
@@ -152,7 +157,7 @@ export function AoVivo() {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Ao Vivo</Text>
-        <View style={{backgroundColor: 'red', width: 8, height: 8, borderRadius: 4, marginLeft: 6}} />
+        <View style={styles.liveDot} />
       </View>
 
       <TextInput
@@ -164,32 +169,14 @@ export function AoVivo() {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#2ecc71" style={{marginTop: 50}} />
+        <ActivityIndicator size="large" color="red" style={{ marginTop: 50 }} />
       ) : error ? (
-        <View style={{padding: 20, alignItems: 'center', justifyContent: 'center', marginTop: 50}}>
-          <Ionicons name="alert-circle-outline" size={40} color="#E74C3C" />
-          <Text style={{color: '#E74C3C', textAlign: 'center', fontWeight: 'bold', marginTop: 10, fontSize: 16}}>
-            {error}
-          </Text>
-          <TouchableOpacity 
-            onPress={fetchMatches}
-            style={{marginTop: 20, padding: 10, backgroundColor: '#2ecc71', borderRadius: 8}}
-            disabled={loading} 
-          >
-            <Text style={{color: '#FFF', fontWeight: 'bold'}}>Tentar Novamente</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={{ color: '#E74C3C' }}>{error}</Text>
       ) : (
         <FlatList
-          data={filteredMatches}
+          data={filtered}
           keyExtractor={(item) => item.id}
           renderItem={renderMatchCard}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          ListEmptyComponent={() => (
-            <Text style={{color: '#AAA', textAlign: 'center', marginTop: 20}}>
-              Nenhum jogo encontrado.
-            </Text>
-          )}
         />
       )}
     </View>

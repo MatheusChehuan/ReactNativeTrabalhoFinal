@@ -10,11 +10,10 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#222',
-    gap: 10
+    gap: 10,
   },
 
   headerTitle: {
@@ -28,13 +27,11 @@ export const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginLeft: 6,
   },
 
   searchInput: {
     backgroundColor: '#1E1E1E',
-    marginHorizontal: 15,
-    marginVertical: 15,
+    margin: 15,
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -48,9 +45,14 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     padding: 15,
     borderRadius: 10,
-    elevation: 3,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#2ecc71',
+  },
+
+  matchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
   },
 
   competitionTitle: {
@@ -72,14 +74,11 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
 
-  teamLogoPlaceholder: {
-    width: 24,
-    height: 24,
+  teamLogo: {
+    width: 26,
+    height: 26,
     marginRight: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#333',
-    borderRadius: 12,
+    resizeMode: 'contain',
   },
 
   teamName: {
@@ -98,32 +97,57 @@ export const styles = StyleSheet.create({
   },
 
   matchStatus: {
-    width: 80, 
-    alignItems: 'flex-end',
+    width: 80,
     justifyContent: 'center',
-    marginLeft: 10,
-    borderLeftWidth: 1,
-    borderLeftColor: '#333',
-    paddingLeft: 5,
+    alignItems: 'flex-end',
+    marginLeft: 15,
   },
 
-  liveBadge: {
-    backgroundColor: 'rgba(231, 76, 60, 0.2)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginBottom: 5,
+  dateText: {
+    color: '#FFF',
+    fontSize: 12,
+    marginBottom: 2,
   },
 
-  liveText: {
-    color: '#E74C3C',
-    fontSize: 10,
+  timeText: {
+    color: '#FFF',
+    fontSize: 12,
     fontWeight: 'bold',
   },
 
-  statusText: {
-    color: '#AAA',
-    fontSize: 12,
-    textAlign: 'center',
+  oddsContainer: {
+    marginTop: 15,
+    gap: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+
+  oddButton: {
+    width: 70,
+    height: 60,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+
+  oddPressed: {
+    transform: [{ scale: 0.94 }],
+    backgroundColor: '#333',
+  },
+
+  oddLabel: {
+    color: '#888',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  oddValue: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 2,
   },
 });
