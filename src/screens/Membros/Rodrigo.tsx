@@ -14,13 +14,13 @@ export default function Rodrigo() {
         </View>
 
         <Text style={styles.sobre}>
-          Jogador apaixonado pelo Flamengo, sempre presente e participativo no projeto.
+          Jogador apaixonado pelo Vasco, sempre presente e participativo no projeto.
         </Text>
 
         <Text style={styles.time}>CR Flamengo</Text>
 
         <Image
-          source={require("../../../assets/Flamengo.png")}
+          source={require("../../../assets/Vasco.png")}
           style={styles.escudo}
         />
       </View>
