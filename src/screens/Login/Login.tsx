@@ -9,7 +9,6 @@ import { useNavigation } from "@react-navigation/native";
 export default function Login() {
   const navigation = useNavigation();
 
-  // ✔️ useContext deve estar AQUI, NÃO dentro da função handleLogin
   const { setLoginData } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
@@ -31,7 +30,6 @@ export default function Login() {
         return;
       }
 
-      // ✔️ Agora isso vai funcionar
       setLoginData(token, nome, idTime);
 
     } catch (error) {
