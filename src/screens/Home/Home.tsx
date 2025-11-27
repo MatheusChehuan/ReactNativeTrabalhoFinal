@@ -1,34 +1,18 @@
-import {
-  View,
-  Text,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Image, ActivityIndicator, ScrollView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { logosTimes } from "../../logosTimes";
+import { styles } from "./styles";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Match {
   id: number;
   utcDate: string;
   status: string;
-  homeTeam: {
-    id: number;
-    name: string;
-  };
-  awayTeam: {
-    id: number;
-    name: string;
-  };
-  score: {
-    fullTime: {
-      home: number | null;
-      away: number | null;
-    };
-  };
+  homeTeam: { id: number; name: string };
+  awayTeam: { id: number; name: string };
+  score: { fullTime: { home: number | null; away: number | null } };
 }
 
 export default function Home() {
@@ -43,7 +27,6 @@ export default function Home() {
         `https://api.football-data.org/v4/teams/${idTime}`,
         { headers: { "X-Auth-Token": "ff34e45f2b0b46e98add24ebc0aa1c89" } }
       );
-
       setTime(resp.data);
     } catch (e) {
       console.log("ERRO TIME:", e);
@@ -108,14 +91,14 @@ export default function Home() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#FFF" />
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Olá, {nome}</Text>
         <View style={styles.timeContainer}>
@@ -144,82 +127,6 @@ export default function Home() {
           ))
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-    paddingVertical: 10,
-  },
-  greeting: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  timeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  logoTime: {
-    width: 40,
-    height: 40,
-  },
-  nomeTime: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  tituloJogos: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#000",
-  },
-  semJogos: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 20,
-  },
-  jogoItem: {
-    backgroundColor: "#f5f5f5",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  dataJogo: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 8,
-  },
-  infoJogo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  adversario: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#000",
-    flex: 1,
-  },
-  resultado: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-});

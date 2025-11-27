@@ -8,9 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function Login() {
   const navigation = useNavigation();
-
   const { setLoginData } = useContext(AuthContext);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +29,6 @@ export default function Login() {
       }
 
       setLoginData(token, nome, idTime);
-
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Usuário ou senha inválidos!");
@@ -40,14 +37,27 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.logo} source={require("../../../assets/icon.png")} />
+      <Image style={styles.logo} source={require("../../../assets/serrabet.png")} />
 
       <View style={styles.areaInput}>
-        <TextInput placeholder="Seu email" value={email} onChangeText={setEmail} style={styles.input}/>
+        <TextInput
+          placeholder="Seu email"
+          placeholderTextColor="#EAEAEA"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+        />
       </View>
 
       <View style={styles.areaInput}>
-        <TextInput placeholder="Sua senha" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry/>
+        <TextInput
+          placeholder="Sua senha"
+          placeholderTextColor="#EAEAEA"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          secureTextEntry
+        />
       </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
