@@ -4,167 +4,126 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 40,
   },
+
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#121212',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+    gap: 10
   },
+
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#FFF',
   },
-  headerIcons: {
-    flexDirection: 'row',
-    gap: 15,
+
+  liveDot: {
+    backgroundColor: 'red',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 6,
   },
-  iconButton: {
-    padding: 8,
-    backgroundColor: '#2A2A2A',
-    borderRadius: 20,
-  },
-  dateSelectorContainer: {
-    height: 60,
-    marginBottom: 10,
-  },
-  dateSelectorContent: {
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    gap: 10,
-  },
-  dateButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#2A2A2A',
-    borderWidth: 1,
-    borderColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dateButtonActive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
-  },
-  dateText: {
-    color: '#AAAAAA',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  dateTextActive: {
-    color: '#000000',
-    fontWeight: 'bold',
-  },
-  sectionHeader: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  competitionTitle: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  competitionSubtitle: {
-    color: '#AAAAAA',
-    fontSize: 12,
-  },
-  matchCard: {
+
+  searchInput: {
     backgroundColor: '#1E1E1E',
     marginHorizontal: 15,
-    marginBottom: 15,
-    borderRadius: 12,
+    marginVertical: 15,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    color: '#FFF',
+    fontSize: 15,
+  },
+
+  matchCard: {
+    backgroundColor: '#1C1C1C',
+    marginHorizontal: 15,
+    marginTop: 10,
     padding: 15,
+    borderRadius: 10,
+    elevation: 3,
     borderWidth: 1,
     borderColor: '#333',
   },
+
+  competitionTitle: {
+    color: '#AAA',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+
   matchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
   },
+
   teamInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
     flex: 1,
   },
+
   teamLogoPlaceholder: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#444',
-    justifyContent: 'center',
+    width: 24,
+    height: 24,
+    marginRight: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#333',
+    borderRadius: 12,
   },
+
   teamName: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    flexShrink: 1,
   },
+
   score: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
     width: 30,
-    textAlign: 'center',
+    textAlign: 'right',
   },
+
   matchStatus: {
+    width: 80, 
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingLeft: 10,
+    marginLeft: 10,
     borderLeftWidth: 1,
     borderLeftColor: '#333',
+    paddingLeft: 5,
   },
+
   liveBadge: {
-    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+    backgroundColor: 'rgba(231, 76, 60, 0.2)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
-    marginBottom: 4,
+    marginBottom: 5,
   },
+
   liveText: {
-    color: '#2ecc71',
+    color: '#E74C3C',
     fontSize: 10,
     fontWeight: 'bold',
   },
+
   statusText: {
-    color: '#AAAAAA',
+    color: '#AAA',
     fontSize: 12,
+    textAlign: 'center',
   },
-  oddsContainer: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: '#333',
-    paddingTop: 10,
-    justifyContent: 'space-between',
-  },
-  oddButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#252525',
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginHorizontal: 4,
-  },
-  oddLabel: {
-    color: '#888',
-    fontSize: 12,
-  },
-  oddValue: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 13,
-  }
 });

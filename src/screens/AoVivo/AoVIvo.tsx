@@ -6,6 +6,7 @@ import {
   TouchableOpacity, 
   FlatList, 
   StatusBar,
+  TextInput,
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,10 +26,10 @@ type Match = {
 };
 
 export function AoVivo() {
-  const [selectedDate, setSelectedDate] = useState('Hoje');
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); 
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchMatches();
@@ -37,6 +38,7 @@ export function AoVivo() {
   async function fetchMatches() {
     setLoading(true);
     setError(null); 
+
     try {
       const response = await footballApi.get('matches');
       
@@ -53,27 +55,37 @@ export function AoVivo() {
           league: item.competition.name
         }));
 
-      setMatches(formattedMatches);
+      const sortedMatches = formattedMatches.sort((a, b) => {
+        const isLiveA = a.status === 'IN_PLAY' || a.status === 'PAUSED';
+        const isLiveB = b.status === 'IN_PLAY' || b.status === 'PAUSED';
+
+        if (isLiveA && !isLiveB) return -1;
+        if (!isLiveA && isLiveB) return 1;
+
+        return a.time.localeCompare(b.time);
+      });
+
+      setMatches(sortedMatches);
 
     } catch (err) {
       const error = err as AxiosError; 
       console.error("Erro ao buscar partidas:", error);
-      
+
       if (error.message === 'Network Error') {
-         setError('Erro de Rede: Verifique sua conexão. Se este erro persistir, aguarde 60s (limite de API).');
+        setError('Erro de Rede: Verifique sua conexão. Se este erro persistir, aguarde 60s (limite de API).');
       } else if (error.response) {
-          const status = error.response.status;
-          if (status === 429) {
-              setError('Limite Excedido (429): Você fez muitas requisições. Aguarde 60 segundos e tente novamente.');
-          } else if (status === 404) {
-              setError('Erro 404: Endpoint da API não encontrado. (Tente novamente em breve)');
-          } else if (status === 403) {
-              setError('Acesso Negado (403): Chave inválida ou acesso não autorizado.');
-          } else {
-              setError(`Erro HTTP ${status}: Falha ao carregar os dados da API.`);
-          }
+        const status = error.response.status;
+        if (status === 429) {
+          setError('Limite Excedido (429): Você fez muitas requisições. Aguarde 60 segundos e tente novamente.');
+        } else if (status === 404) {
+          setError('Erro 404: Endpoint da API não encontrado.');
+        } else if (status === 403) {
+          setError('Acesso Negado (403): Chave inválida ou acesso não autorizado.');
+        } else {
+          setError(`Erro HTTP ${status}: Falha ao carregar os dados.`);
+        }
       } else {
-         setError('Ocorreu um erro desconhecido. Tente novamente.');
+        setError('Ocorreu um erro desconhecido.');
       }
       
     } finally {
@@ -81,26 +93,9 @@ export function AoVivo() {
     }
   }
 
-  const renderDateSelector = () => (
-    <View style={styles.dateSelectorContainer}>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.dateSelectorContent}
-      >
-        {['Ontem', 'Hoje', 'Amanhã', 'qua. 26', 'qui. 27'].map((date) => (
-          <TouchableOpacity 
-            key={date}
-            style={[styles.dateButton, selectedDate === date && styles.dateButtonActive]}
-            onPress={() => setSelectedDate(date)}
-          >
-            <Text style={[styles.dateText, selectedDate === date && styles.dateTextActive]}>
-              {date}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
+  const filteredMatches = matches.filter((m) =>
+    m.homeTeam.toLowerCase().includes(search.toLowerCase()) ||
+    m.awayTeam.toLowerCase().includes(search.toLowerCase())
   );
 
   const renderMatchCard = ({ item }: { item: Match }) => {
@@ -147,21 +142,6 @@ export function AoVivo() {
             </Text>
           </View>
         </View>
-
-        <View style={styles.oddsContainer}>
-          <View style={styles.oddButton}>
-            <Text style={styles.oddLabel}>1</Text>
-            <Text style={styles.oddValue}>1.93</Text>
-          </View>
-          <View style={styles.oddButton}>
-            <Text style={styles.oddLabel}>X</Text>
-            <Text style={styles.oddValue}>3.25</Text>
-          </View>
-          <View style={styles.oddButton}>
-            <Text style={styles.oddLabel}>2</Text>
-            <Text style={styles.oddValue}>4.30</Text>
-          </View>
-        </View>
       </View>
     );
   };
@@ -169,21 +149,19 @@ export function AoVivo() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#121212" />
-      
+
       <View style={styles.header}>
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-          <Text style={styles.headerTitle}>Ao Vivo</Text>
-          <View style={{backgroundColor: 'red', width: 8, height: 8, borderRadius: 4}} />
-        </View>
-        
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="filter-outline" size={20} color="#FFF" />
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.headerTitle}>Ao Vivo</Text>
+        <View style={{backgroundColor: 'red', width: 8, height: 8, borderRadius: 4, marginLeft: 6}} />
       </View>
 
-      {renderDateSelector()}
+      <TextInput
+        placeholder="Buscar time..."
+        placeholderTextColor="#888"
+        style={styles.searchInput}
+        value={search}
+        onChangeText={setSearch}
+      />
 
       {loading ? (
         <ActivityIndicator size="large" color="#2ecc71" style={{marginTop: 50}} />
@@ -203,12 +181,14 @@ export function AoVivo() {
         </View>
       ) : (
         <FlatList
-          data={matches}
+          data={filteredMatches}
           keyExtractor={(item) => item.id}
           renderItem={renderMatchCard}
           contentContainerStyle={{ paddingBottom: 20 }}
           ListEmptyComponent={() => (
-             <Text style={{color: '#AAA', textAlign: 'center', marginTop: 20}}>Nenhum jogo disponível no momento para o filtro "Hoje".</Text>
+            <Text style={{color: '#AAA', textAlign: 'center', marginTop: 20}}>
+              Nenhum jogo encontrado.
+            </Text>
           )}
         />
       )}
