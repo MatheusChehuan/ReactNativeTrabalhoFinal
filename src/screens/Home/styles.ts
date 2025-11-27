@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 4,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: "#2ecc71",
     minHeight: 100,
   },
   dataJogo: {

@@ -1,4 +1,13 @@
-import {View,Text,Alert,TextInput,Image,TouchableOpacity} from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import api from "../../services/api";
@@ -16,7 +25,7 @@ export default function Login() {
     try {
       const resp = await api.post("/login", {
         email: email,
-        senha: password
+        senha: password,
       });
 
       console.log("RESP LOGIN >>>", resp.data);
@@ -36,37 +45,45 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Image style={styles.logo} source={require("../../../assets/serrabet.png")} />
-
-      <View style={styles.areaInput}>
-        <TextInput
-          placeholder="Seu email"
-          placeholderTextColor="#EAEAEA"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Image
+          style={styles.logo}
+          source={require("../../../assets/serrabet.png")}
         />
+
+        <View style={styles.areaInput}>
+          <TextInput
+            placeholder="Seu email"
+            placeholderTextColor="#EAEAEA"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.areaInput}>
+          <TextInput
+            placeholder="Sua senha"
+            placeholderTextColor="#EAEAEA"
+            value={password}
+            onChangeText={setPassword}
+            style={styles.input}
+            secureTextEntry
+          />
+        </View>
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
+          <Text style={styles.submitText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={() => navigation.navigate("Cadastro")}
+        >
+          <Text style={styles.submitText}>Criar Conta</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.areaInput}>
-        <TextInput
-          placeholder="Sua senha"
-          placeholderTextColor="#EAEAEA"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          secureTextEntry
-        />
-      </View>
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
-        <Text style={styles.submitText}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.submitButton} onPress={() => navigation.navigate("Cadastro")}>
-        <Text style={styles.submitText}>Criar Conta</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
