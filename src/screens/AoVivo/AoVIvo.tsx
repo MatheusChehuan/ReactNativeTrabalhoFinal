@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,13 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
-} from 'react-native';
-import { styles } from './styles';
-import footballApi from '../../services/footballApi';
-import { logosTimes } from '../../logosTimes';
+  Animated,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import { styles } from "./styles";
+import footballApi from "../../services/footballApi";
+import { logosTimes } from "../../logosTimes";
 
 type Match = {
   id: string;
@@ -30,11 +33,31 @@ type Match = {
 export function AoVivo() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const generateOdd = () =>
-    (Math.random() * (5 - 1.4) + 1.4).toFixed(2);
+  const pulse = useState(new Animated.Value(1))[0];
+
+  useEffect(() => {
+    fetchAllMatches();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 0,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const generateOdd = () => (Math.random() * (5 - 1.4) + 1.4).toFixed(2);
 
   useEffect(() => {
     fetchAllMatches();
@@ -45,11 +68,11 @@ export function AoVivo() {
     setError(null);
 
     try {
-      const scheduled = await footballApi.get('matches?status=SCHEDULED');
-      const live = await footballApi.get('matches?status=LIVE');
+      const scheduled = await footballApi.get("matches?status=SCHEDULED");
+      const live = await footballApi.get("matches?status=LIVE");
 
       const formatted = [...scheduled.data.matches, ...live.data.matches]
-        .filter((item: any) => item.status !== 'POSTPONED')
+        .filter((item: any) => item.status !== "POSTPONED")
         .map((item: any) => ({
           id: item.id.toString(),
           homeTeam: item.homeTeam.shortName || item.homeTeam.name,
@@ -62,17 +85,18 @@ export function AoVivo() {
           date: new Date(item.utcDate),
           league: item.competition.name,
           odds: [
-            { botao: '1', odd: generateOdd() },
-            { botao: 'X', odd: generateOdd() },
-            { botao: '2', odd: generateOdd() }
-          ]
+            { botao: "1", odd: generateOdd() },
+            { botao: "X", odd: generateOdd() },
+            { botao: "2", odd: generateOdd() },
+          ],
         }));
 
-      const sorted = formatted.sort((a, b) => a.date.getTime() - b.date.getTime());
+      const sorted = formatted.sort(
+        (a, b) => a.date.getTime() - b.date.getTime()
+      );
       setMatches(sorted);
-
     } catch (e) {
-      setError('Não foi possível carregar os jogos.');
+      setError("Não foi possível carregar os jogos.");
     }
 
     setLoading(false);
@@ -85,14 +109,14 @@ export function AoVivo() {
   );
 
   const renderMatchCard = ({ item }: { item: Match }) => {
-    const dia = item.date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
+    const dia = item.date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
     });
 
-    const hora = item.date.toLocaleString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
+    const hora = item.date.toLocaleString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
     return (
@@ -101,9 +125,8 @@ export function AoVivo() {
           <Text style={styles.competitionTitle}>{item.league}</Text>
         </View>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>
-
             <View style={styles.matchRow}>
               <View style={styles.teamInfo}>
                 <Image
@@ -112,7 +135,7 @@ export function AoVivo() {
                 />
                 <Text style={styles.teamName}>{item.homeTeam}</Text>
               </View>
-              <Text style={styles.score}>{item.homeScore ?? '-'}</Text>
+              <Text style={styles.score}>{item.homeScore ?? "-"}</Text>
             </View>
 
             <View style={styles.matchRow}>
@@ -123,7 +146,7 @@ export function AoVivo() {
                 />
                 <Text style={styles.teamName}>{item.awayTeam}</Text>
               </View>
-              <Text style={styles.score}>{item.awayScore ?? '-'}</Text>
+              <Text style={styles.score}>{item.awayScore ?? "-"}</Text>
             </View>
           </View>
 
@@ -139,7 +162,7 @@ export function AoVivo() {
               key={i}
               style={({ pressed }) => [
                 styles.oddButton,
-                pressed && styles.oddPressed
+                pressed && styles.oddPressed,
               ]}
             >
               <Text style={styles.oddLabel}>{o.botao}</Text>
@@ -152,33 +175,47 @@ export function AoVivo() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#121212" />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#121212" />
 
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Ao Vivo</Text>
-        <View style={styles.liveDot} />
-      </View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Ao Vivo</Text>
+          <Animated.View
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "#ff3b30",
+              opacity: pulse,
+            }}
+          />
+        </View>
 
-      <TextInput
-        placeholder="Buscar time..."
-        placeholderTextColor="#888"
-        style={styles.searchInput}
-        value={search}
-        onChangeText={setSearch}
-      />
-
-      {loading ? (
-        <ActivityIndicator size="large" color="red" style={{ marginTop: 50 }} />
-      ) : error ? (
-        <Text style={{ color: '#E74C3C' }}>{error}</Text>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          renderItem={renderMatchCard}
+        <TextInput
+          placeholder="Buscar time..."
+          placeholderTextColor="#888"
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
         />
-      )}
-    </View>
+
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="red"
+            style={{ marginTop: 50 }}
+          />
+        ) : error ? (
+          <Text style={{ color: "#E74C3C" }}>{error}</Text>
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            renderItem={renderMatchCard}
+          />
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }

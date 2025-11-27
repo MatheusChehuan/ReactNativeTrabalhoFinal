@@ -20,6 +20,9 @@ export const styles = StyleSheet.create({
     width: "100%",
     minHeight: 500,
     justifyContent: "flex-start",
+    borderColor: "#2ecc71",
+    borderWidth: 1,
+    elevation: 4,
   },
   topo: {
     flexDirection: "row",
@@ -27,7 +30,7 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
   foto: {
-    width: 80,   // menor
+    width: 80,
     height: 80,
     borderRadius: 40,
     backgroundColor: "#333",
@@ -53,7 +56,7 @@ export const styles = StyleSheet.create({
     textAlign: "left",
   },
   escudo: {
-    width: 140,   // bem maior
+    width: 140,
     height: 140,
     alignSelf: "center",
     marginTop: 20,

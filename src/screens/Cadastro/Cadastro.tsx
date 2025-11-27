@@ -1,4 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import api from "../../services/api";
@@ -27,7 +36,6 @@ export default function Cadastro() {
         );
 
         setTimes(resposta.data.teams);
-
       } catch (error: any) {
         console.log(
           "Erro ao buscar times:",
@@ -57,7 +65,6 @@ export default function Cadastro() {
 
       Alert.alert("Conta criada com sucesso!");
       navigation.navigate("Login");
-
     } catch (erro) {
       console.log("ERRO NO CADASTRO:", erro);
       Alert.alert("Erro ao cadastrar! Tente novamente.");
@@ -65,63 +72,62 @@ export default function Cadastro() {
   }
 
   return (
-    <View style={styles.container}>
-
-
-      <Image
-  source={require("../../../assets/serrabet.png")}
-  style={styles.imageLogo}
-/>
-
-      <View style={styles.areaInput}>
-        <TextInput
-          placeholder="Seu nome"
-          placeholderTextColor="#AAA"
-          style={styles.input}
-          value={nome}
-          onChangeText={setNome}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Image
+          source={require("../../../assets/serrabet.png")}
+          style={styles.imageLogo}
         />
+
+        <View style={styles.areaInput}>
+          <TextInput
+            placeholder="Seu nome"
+            placeholderTextColor="#AAA"
+            style={styles.input}
+            value={nome}
+            onChangeText={setNome}
+          />
+        </View>
+
+        <View style={styles.areaInput}>
+          <TextInput
+            placeholder="Seu email"
+            placeholderTextColor="#AAA"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        <View style={styles.areaInput}>
+          <TextInput
+            placeholder="Sua senha"
+            placeholderTextColor="#AAA"
+            style={styles.input}
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+          />
+        </View>
+
+        <Text style={styles.pickerLabel}>Escolha seu time do coração</Text>
+
+        <Picker
+          selectedValue={timeEscolhido}
+          onValueChange={(v) => setTimeEscolhido(Number(v))}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione um time..." value={null} />
+
+          {times.map((t: any) => (
+            <Picker.Item key={t.id} label={t.name} value={t.id} />
+          ))}
+        </Picker>
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleCadastro}>
+          <Text style={styles.submitText}>Cadastrar</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.areaInput}>
-        <TextInput
-          placeholder="Seu email"
-          placeholderTextColor="#AAA"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-        />
-      </View>
-
-      <View style={styles.areaInput}>
-        <TextInput
-          placeholder="Sua senha"
-          placeholderTextColor="#AAA"
-          style={styles.input}
-          value={senha}
-          onChangeText={setSenha}
-          secureTextEntry
-        />
-      </View>
-
-      <Text style={styles.pickerLabel}>Escolha seu time do coração</Text>
-
-      <Picker
-        selectedValue={timeEscolhido}
-        onValueChange={(v) => setTimeEscolhido(Number(v))}
-        style={styles.picker}
-      >
-        <Picker.Item label="Selecione um time..." value={null} />
-
-        {times.map((t: any) => (
-          <Picker.Item key={t.id} label={t.name} value={t.id} />
-        ))}
-      </Picker>
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleCadastro}>
-        <Text style={styles.submitText}>Cadastrar</Text>
-      </TouchableOpacity>
-
-    </View>
+    </TouchableWithoutFeedback>
   );
 }

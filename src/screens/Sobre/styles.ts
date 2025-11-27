@@ -23,6 +23,9 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
     minHeight: 100,
+    borderColor: "#2ecc71",
+    borderWidth: 1,
+    elevation: 4,
   },
   foto: {
     width: 80,
